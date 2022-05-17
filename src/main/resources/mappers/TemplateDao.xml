@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.authentication.TemplateDao">
+    <resultMap id="Template" type="com.stackfarm.esports.pojo.authorize.Template">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="full_path" jdbcType="VARCHAR" property="fullPath"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+    </resultMap>
+
+
+    <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.stackfarm.esports.pojo.authorize.Template">
+        insert into template (name, full_path, create_time, update_time)
+        values (#{name,jdbcType=VARCHAR}, #{fullPath,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete
+        from template
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.authorize.Template">
+        update template
+        set name      = #{name,jdbcType=VARCHAR},
+            full_path = #{fullPath,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=BIGINT},
+            update_time = #{updateTime,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="Template">
+        select * from template where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+</mapper>

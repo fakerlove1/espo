@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.authentication.ApplicationDao">
+    <resultMap id="Application" type="com.stackfarm.esports.pojo.authorize.Application">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="member_id" jdbcType="BIGINT" property="memberId"/>
+        <result column="application_type" jdbcType="VARCHAR" property="applicationType"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="check_time" jdbcType="BIGINT" property="checkTime"/>
+        <result column="result" jdbcType="TINYINT" property="result"/>
+        <result column="cause" jdbcType="VARCHAR" property="cause"/>
+        <result column="profile" jdbcType="VARCHAR" property="profile"/>
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.stackfarm.esports.pojo.authorize.Application">
+        insert into application (member_id, application_type, create_time, check_time, result, cause, profile)
+        values (#{memberId,jdbcType=BIGINT}, #{applicationType,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{checkTime,jdbcType=BIGINT},
+                #{result,jdbcType=TINYINT},  #{cause,jdbcType=VARCHAR}, #{profile,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from application
+            where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.authorize.Application">
+        update application
+        set application_type = #{applicationType,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=BIGINT},
+            check_time = #{checkTime,jdbcType=BIGINT},
+            result   = #{result,jdbcType=VARCHAR},
+            cause       = #{cause,jdbcType=VARCHAR},
+            profile    = #{profile,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="Application">
+        select * from application where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByMemberIdAndType" resultMap="Application">
+        select * from application where member_id = #{memberId,jdbcType=BIGINT} and `application_type` = #{applicationType,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByApplicationType" resultMap="Application">
+        select * from application where application_type = #{applicationType,jdbcType=VARCHAR}
+                  and result is null
+                order by create_time desc
+    </select>
+
+    <select id="selectByResult" resultMap="Application">
+        select * from application
+        where result = #{result}
+    </select>
+
+    <select id="selectAll" resultMap="Application">
+        select * from application where result is null
+    </select>
+
+</mapper>

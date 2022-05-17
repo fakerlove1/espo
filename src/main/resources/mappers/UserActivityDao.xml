@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.UserActivityDao">
+    <resultMap id="UserActivity" type="com.stackfarm.esports.pojo.user.UserActivity">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="act_id" jdbcType="BIGINT" property="actId"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="cause" jdbcType="VARCHAR" property="cause"/>
+        <result column="point" jdbcType="INTEGER" property="point"/>
+        <result column="staff_type" jdbcType="VARCHAR" property="staffType"/>
+        <result column="team_name" jdbcType="VARCHAR" property="teamName"/>
+        <result column="member_count" jdbcType="INTEGER" property="memberCount"/>
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.stackfarm.esports.pojo.user.UserActivity"
+            useGeneratedKeys="true">
+        insert into user_activity (id, user_id, act_id, create_time, state,
+                                   cause, `point`, staff_type,
+                                   team_name, member_count)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{actId,jdbcType=BIGINT},
+                #{createTime,jdbcType=BIGINT}, #{state,jdbcType=VARCHAR},
+                #{cause,jdbcType=VARCHAR}, #{point,jdbcType=INTEGER},
+                #{staffType,jdbcType=VARCHAR},#{teamName,jdbcType=VARCHAR},
+                #{memberCount,jdbcType=INTEGER})
+    </insert>
+
+    <delete id="deleteById">
+        delete from user_activity
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByUserId">
+        delete from user_activity
+        where user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.UserActivity">
+        update user_activity
+        set user_id         = #{userId,jdbcType=BIGINT},
+            act_id          = #{actId,jdbcType=BIGINT},
+            create_time     = #{createTime,jdbcType=BIGINT},
+            `state`         = #{state,jdbcType=VARCHAR},
+            cause           = #{cause,jdbcType=VARCHAR},
+            `point`         = #{point,jdbcType=INTEGER},
+            staff_type      = #{staffType,jdbcType=VARCHAR},
+            team_name       = #{teamName,jdbcType=VARCHAR},
+            member_count    = #{memberCount,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="UserActivity">
+        select * from user_activity
+        where id = #{id,jdbcType=BIGINT} order by create_time desc
+    </select>
+
+    <select id="selectByUserIdAndActId" resultMap="UserActivity">
+        select * from user_activity
+        where  user_id= #{userId,jdbcType=BIGINT} and act_id = #{actId,jdbcType=BIGINT} order by create_time desc
+    </select>
+
+    <select id="selectAll" resultMap="UserActivity">
+        select * from user_activity order by create_time desc
+    </select>
+
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="UserActivity">
+        select * from user_activity
+        where user_id = #{userId,jdbcType=BIGINT} order by create_time desc
+    </select>
+
+    <select id="selectByActId" parameterType="java.lang.Long" resultMap="UserActivity">
+        select * from user_activity
+        where act_id = #{actId,jdbcType=BIGINT} order by create_time desc
+    </select>
+
+    <select id="selectByActIdAndState" resultMap="UserActivity">
+        select * from user_activity
+        where act_id = #{actId,jdbcType=BIGINT} and state = #{state,jdbcType=VARCHAR} order by create_time desc
+    </select>
+
+</mapper>

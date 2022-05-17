@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.activity.ActivityUnexpectDao">
+    <resultMap id="ActivityUnexpect" type="com.stackfarm.esports.pojo.activity.ActivityUnexpect">
+        <id column="activity_id" jdbcType="BIGINT" property="activityId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="message" jdbcType="LONGVARCHAR" property="message"/>
+    </resultMap>
+
+    <select id="selectByActId" parameterType="java.lang.Long" resultMap="ActivityUnexpect">
+        select * from activity_unexpect
+        where activity_id = #{activityId,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.stackfarm.esports.pojo.activity.ActivityUnexpect" useGeneratedKeys="true">
+        insert into activity_unexpect (activity_id, user_id, message)
+        values (#{activityId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{message,jdbcType=LONGVARCHAR})
+    </insert>
+
+    <delete id="deleteByActId" parameterType="java.lang.Long">
+        delete
+        from activity_unexpect
+        where activity_id = #{activityId,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.activity.ActivityUnexpect">
+        update activity_unexpect
+        set activity_id       = #{activityId,jdbcType=BIGINT},
+            user_id       = #{userId,jdbcType=BIGINT},
+            message = #{message,jdbcType=LONGVARCHAR}
+        where activity_id = #{activityId,jdbcType=BIGINT}
+    </update>
+</mapper>

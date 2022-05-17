@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.authentication.ProjectDao">
+    <resultMap id="Project" type="com.stackfarm.esports.pojo.authorize.Project">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+    </resultMap>
+
+
+    <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.stackfarm.esports.pojo.authorize.Project">
+        insert into project (name, description)
+        values (#{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from project
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.authorize.Project">
+        update project
+        set name      = #{name,jdbcType=VARCHAR},
+            description = #{description,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="Project">
+        select * from project where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByName" parameterType="java.lang.String" resultMap="Project">
+        select * from project where name = #{name,jdbcType=VARCHAR}
+    </select>
+</mapper>

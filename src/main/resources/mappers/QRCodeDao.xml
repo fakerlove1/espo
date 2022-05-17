@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.qrcode.QRCodeDao">
+    <resultMap id="QRCode" type="com.stackfarm.esports.pojo.qrcode.QRCode">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="activity_id" jdbcType="BIGINT" property="activityId"/>
+        <result column="qr_code" jdbcType="VARCHAR" property="qrCode"/>
+        <result column="is_available" jdbcType="TINYINT" property="isAvailable"/>
+    </resultMap>
+
+
+    <insert id="insert" keyColumn="user_id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.stackfarm.esports.pojo.qrcode.QRCode">
+        insert into qr_code (user_id, activity_id, qr_code, is_available)
+        values (#{userId,jdbcType=BIGINT}, #{activityId,jdbcType=BIGINT}, #{qrCode,jdbcType=VARCHAR}, #{isAvailable,jdbcType=TINYINT})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from qr_code
+        where user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.qrcode.QRCode">
+        update qr_code
+        set qr_code       = #{qrCode,jdbcType=VARCHAR},
+            is_available = #{isAvailable,jdbcType=TINYINT}
+        where user_id = #{userId,jdbcType=BIGINT} and activity_id = #{activityId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByUserIdAndActivityId" parameterType="java.lang.Long" resultMap="QRCode">
+        select * from qr_code where user_id = #{userId,jdbcType=BIGINT} and activity_id = #{activityId,jdbcType=BIGINT}
+    </select>
+</mapper>

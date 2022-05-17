@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.activity.ActivityExtensionDao">
+    <resultMap id="ActivityExtension" type="com.stackfarm.esports.pojo.activity.ActivityExtension">
+        <id column="act_id" jdbcType="BIGINT" property="actId"/>
+        <result column="staff_types" jdbcType="VARCHAR" property="staffTypes"/>
+        <result column="staff_types_count" jdbcType="VARCHAR" property="staffTypesCount"/>
+        <result column="requirement" jdbcType="VARCHAR" property="requirement"/>
+        <result column="cost" jdbcType="DECIMAL" property="cost"/>
+        <result column="reward" jdbcType="DECIMAL" property="reward"/>
+        <result column="point" jdbcType="INTEGER" property="point"/>
+        <result column="contact_way" jdbcType="VARCHAR" property="contactWay"/>
+        <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="poster" jdbcType="VARCHAR" property="poster"/>
+        <result column="picture" jdbcType="VARCHAR" property="picture"/>
+        <result column="plan" jdbcType="VARCHAR" property="plan"/>
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.stackfarm.esports.pojo.activity.ActivityExtension"
+            useGeneratedKeys="true">
+        insert into activity_extension (act_id, staff_types, staff_types_count,
+                              requirement, cost, reward,
+                              point, contact_way, introduction,
+                              poster, picture, plan)
+        values (#{actId,jdbcType=BIGINT}, #{staffTypes,jdbcType=VARCHAR}, #{staffTypesCount,jdbcType=VARCHAR},
+                #{requirement,jdbcType=VARCHAR}, #{cost,jdbcType=DECIMAL}, #{reward,jdbcType=DECIMAL},
+                #{point,jdbcType=INTEGER}, #{contactWay,jdbcType=VARCHAR}, #{introduction,jdbcType=VARCHAR},
+                #{poster,jdbcType=VARCHAR}, #{picture,jdbcType=VARCHAR}, #{plan,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from activity_extension
+        where act_id = #{actId,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.activity.Activity">
+        update activity_extension
+        set act_id                   = #{actId,jdbcType=BIGINT},
+            staff_types              = #{staffTypes,jdbcType=VARCHAR},
+            staff_types_count        = #{staffTypesCount,jdbcType=VARCHAR},
+            requirement              = #{requirement,jdbcType=VARCHAR},
+            cost                     = #{cost,jdbcType=DECIMAL},
+            reward                   = #{reward,jdbcType=DECIMAL},
+            point                    = #{point,jdbcType=INTEGER},
+            contact_way              = #{contactWay,jdbcType=VARCHAR},
+            introduction             = #{introduction,jdbcType=VARCHAR},
+            poster                   = #{poster,jdbcType=VARCHAR},
+            picture                  = #{picture,jdbcType=VARCHAR},
+            plan                     = #{plan,jdbcType=VARCHAR}
+        where act_id = #{actId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByActId" parameterType="java.lang.Long" resultMap="ActivityExtension">
+        select * from activity_extension
+        where act_id = #{actId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByPicture" parameterType="java.lang.String" resultMap="ActivityExtension">
+        select *
+        from activity_extension
+        where picture = #{picture,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByPoster" parameterType="java.lang.String" resultMap="ActivityExtension">
+        select *
+        from activity_extension
+        where poster = #{poster,jdbcType=VARCHAR}
+    </select>
+
+
+</mapper>

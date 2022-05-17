@@ -1,0 +1,167 @@
+server:
+  port: 8090
+  max-http-header-size: 8192
+  tomcat:
+    uri-encoding: UTF-8
+    max-connections: 10000
+    threads:
+      max: 400
+  error:
+    path: /error
+spring:
+  servlet:
+    multipart:
+      enabled: on
+      max-file-size: 50MB
+      max-request-size: 55MB
+  redis:
+    lettuce:
+      pool:
+        max-wait: 3000
+        max-idle: 8
+        min-idle: 1
+    timeout: 3000
+#  mvc:
+#    static-path-pattern: /static/**
+#  resources:
+#    static-locations: classpath:/static/
+#  mail:
+#    host: smtpdm.aliyun.com
+#    username: stackfarm@jitclass.cn
+#    password: pe1FzURbv3h1bQiu
+#    port: 80
+#    protocol: smtp
+#    default-encoding: UTF-8
+#    test-connection: false
+  mail:
+    host: smtphz.qiye.163.com
+    username: admin@jsdj.sportsjs.cn
+    password: FurcQLmVWucTgfun
+    port: 25
+    protocol: smtp
+    default-encoding: UTF-8
+    test-connection: false
+  profiles:
+    active: server
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:mappers/*.xml
+logging:
+  level:
+    org.springframework: WARN
+# token过期时间，单位：小时
+tokenExpireTime: 168
+invCodeRemNum: 20
+
+#手机短信发送
+secretId: AKIDskMinCuJGxObZNO2tWKuCExSfjb0trBG
+secretKey: 3rPgqlTv6KIk5A4nHZaKzLRGp8FSdkbE
+appId: 1400504436
+sender: 江苏省电子竞技运动协会
+# 注册验证码模板
+smsTemplateRegister: 917298
+# 重置密码验证码模板
+smsTemplateReset: 917302
+# 报名成功通知模板
+smsTemplateAccess: 920860
+
+#邮箱用户名
+emailUsername: admin@jsdj.sportsjs.cn
+#emailUsername: stackfarm@jitclass.cn
+
+#认证有效期 单位：年
+authenticationEffectiveTime: 3
+##年审开始时间(月-日) 用-分隔
+#annualBeginTime: 12-31
+##年审结束时间（月-日） 用-分隔
+#annualEndTime: 1-31
+
+
+
+
+---
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/e_sports?serverTimezone=GMT%2B8
+    username: root
+    password: root
+    driver: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    #password: 461200
+    database: 0
+    timeout: 3000
+  config:
+    activate:
+      on-profile: cyy
+# 文件保存根路径
+fileRootPath: D:\e-sports
+#打包文件暂存地址
+zipFileTemporaryPath: D:\e-sports\temporary
+#二维码保存地址
+qrCodePath: D:\e-sports\qrcode
+---
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/e_sports_business?serverTimezone=GMT%2B8
+    username: root
+    password: "001219"
+    driver: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    #password: 461200
+    database: 0
+    timeout: 3000
+  config:
+    activate:
+      on-profile: dyq
+
+fileRootPath: D:\e-sports
+#打包文件暂存地址
+zipFileTemporaryPath: D:\e-sports\temporary
+#二维码保存地址
+qrCodePath: D:\e-sports\qrcode
+---
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/e_sports?serverTimezone=GMT%2B8
+    username: e_sports
+    password: LxhPBSTHPpxnGjdb
+    driver: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 3000
+  config:
+    activate:
+      on-profile: server
+# 文件保存根路径
+fileRootPath: /home/E-Sports
+#打包文件暂存地址
+zipFileTemporaryPath: /home/E-Sports/temporary
+#二维码保存地址
+qrCodePath: /home/E-Sports/qrcode
+---
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/e_sports?serverTimezone=GMT%2B8
+    username: e_sports
+    password: root
+    driver: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 3000
+  config:
+    activate:
+      on-profile: cisland
+# 文件保存根路径
+fileRootPath: /home/E-Sports
+#打包文件暂存地址
+zipFileTemporaryPath: /home/E-Sports/temporary
+#二维码保存地址
+qrCodePath: /home/E-Sports/qrcode

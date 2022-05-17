@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.authentication.SendInformationDao">
+    <resultMap id="SendInformation" type="com.stackfarm.esports.pojo.authorize.SendInformation">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="member_id" jdbcType="BIGINT" property="memberId"/>
+        <result column="receiver_name" jdbcType="VARCHAR" property="receiverName"/>
+        <result column="phone_number" jdbcType="VARCHAR" property="phoneNumber"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="cost" jdbcType="INTEGER" property="cost"/>
+        <result column="need_receipt" jdbcType="TINYINT" property="needReceipt"/>
+        <result column="cause" jdbcType="VARCHAR" property="cause"/>
+        <result column="evidence" jdbcType="VARCHAR" property="evidence"/>
+        <result column="tracking_number" jdbcType="VARCHAR" property="trackingNumber"/>
+        <result column="state" jdbcType="TINYINT" property="state"/>
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.stackfarm.esports.pojo.authorize.SendInformation">
+        insert into send_information (member_id, receiver_name, phone_number, address, cost, need_receipt, cause, evidence, tracking_number, state)
+        values (#{memberId,jdbcType=BIGINT}, #{receiverName,jdbcType=VARCHAR}, #{phoneNumber,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
+                #{cost,jdbcType=INTEGER},  #{needReceipt,jdbcType=TINYINT}, #{cause,jdbcType=VARCHAR}, #{evidence,jdbcType=VARCHAR}, #{trackingNumber,jdbcType=VARCHAR}, #{state,jdbcType=TINYINT})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from send_information
+            where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.authorize.SendInformation">
+        update send_information
+        set receiver_name = #{receiverName,jdbcType=VARCHAR},
+            phone_number = #{phoneNumber,jdbcType=VARCHAR},
+            address = #{address,jdbcType=VARCHAR},
+            cost   = #{cost,jdbcType=INTEGER},
+            need_receipt       = #{needReceipt,jdbcType=TINYINT},
+            cause       = #{cause,jdbcType=VARCHAR},
+            evidence       = #{evidence,jdbcType=VARCHAR},
+            tracking_number       = #{trackingNumber,jdbcType=VARCHAR},
+            state    = #{state,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectFirstByMemberId" parameterType="java.lang.Long" resultMap="SendInformation">
+        select * from send_information where member_id = #{memberId,jdbcType=BIGINT} and cause is null
+    </select>
+
+    <select id="selectRedoByMemberId" parameterType="java.lang.Long" resultMap="SendInformation">
+        select * from send_information where member_id = #{memberId,jdbcType=BIGINT} and cause is not null
+    </select>
+
+
+    <select id="selectAll" resultMap="SendInformation">
+        select * from send_information where state = false
+    </select>
+
+    <select id="selectByClub" resultMap="SendInformation">
+        select * from send_information where club = #{club,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectById" resultMap="SendInformation">
+        select * from send_information where id = #{id,jdbcType=BIGINT}
+    </select>
+
+</mapper>

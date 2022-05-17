@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.UserExtensionPersonDao">
+    <resultMap id="userExtensionPerson" type="com.stackfarm.esports.pojo.user.UserExtensionPerson">
+        <id column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="phone_number" jdbcType="BIGINT" property="phoneNumber"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="qq" jdbcType="BIGINT" property="qq"/>
+        <result column="wechat" jdbcType="VARCHAR" property="wechat"/>
+        <result column="alipay" jdbcType="VARCHAR" property="alipay"/>
+        <result column="card_id" jdbcType="VARCHAR" property="cardId"/>
+        <result column="prefer_position" jdbcType="VARCHAR" property="preferPosition"/>
+        <result column="experience" jdbcType="VARCHAR" property="experience"/>
+        <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="profile" jdbcType="VARCHAR" property="profile"/>
+        <result column="invitation_code" jdbcType="VARCHAR" property="invitationCode"/>
+        <result column="education" jdbcType="VARCHAR" property="education"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        user_id, phone_number, email, qq, wechat, alipay, card_id, prefer_position, experience, introduction, profile, invitation_code, education
+    </sql>
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="userExtensionPerson">
+        select
+        <include refid="Base_Column_List"/>
+        from user_extension_person
+        where user_id = #{userId,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="selectByEmail" parameterType="java.lang.String" resultMap="userExtensionPerson">
+        select
+        <include refid="Base_Column_List"/>
+        from user_extension_person
+        where email = #{email,jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="selectByPhoneNumber" parameterType="java.lang.Long" resultMap="userExtensionPerson">
+        select
+        <include refid="Base_Column_List"/>
+        from user_extension_person
+        where phone_number = #{phoneNumber,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        delete
+        from user_extension_person
+        where user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="user_id" keyProperty="userId"
+            parameterType="com.stackfarm.esports.pojo.user.UserExtensionPerson">
+        insert into user_extension_person (user_id, phone_number, email,
+                                    qq, wechat, alipay, card_id,
+                                    prefer_position, experience, introduction, profile, invitation_code, education)
+        values (#{userId,jdbcType=BIGINT}, #{phoneNumber,jdbcType=BIGINT}, #{email,jdbcType=VARCHAR},
+                #{qq,jdbcType=BIGINT}, #{wechat,jdbcType=VARCHAR}, #{alipay,jdbcType=VARCHAR},
+                 #{cardId,jdbcType=VARCHAR}, #{preferPosition,jdbcType=VARCHAR},
+                 #{experience,jdbcType=VARCHAR}, #{introduction,jdbcType=VARCHAR}, #{profile,jdbcType=VARCHAR}, #{invitationCode}, #{education})
+    </insert>
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.UserExtensionPerson">
+        update user_extension_person
+        set phone_number = #{phoneNumber,jdbcType=BIGINT},
+            email = #{email,jdbcType=VARCHAR},
+            qq = #{qq,jdbcType=BIGINT},
+            wechat = #{wechat,jdbcType=VARCHAR},
+            alipay = #{alipay,jdbcType=VARCHAR},
+            prefer_position = #{preferPosition,jdbcType=VARCHAR},
+            card_id = #{cardId,jdbcType=VARCHAR},
+            prefer_position = #{preferPosition,jdbcType=VARCHAR},
+            experience = #{experience,jdbcType=VARCHAR},
+            introduction = #{introduction,jdbcType=VARCHAR},
+            profile = #{profile,jdbcType=VARCHAR},
+            invitation_code = #{invitationCode,jdbcType=VARCHAR},
+            education = #{education,jdbcType=VARCHAR}
+        where user_id = #{userId,jdbcType=BIGINT}
+    </update>
+</mapper>

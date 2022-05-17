@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.UserExtensionOrganizationDao">
+    <resultMap id="userExtensionOrganization" type="com.stackfarm.esports.pojo.user.UserExtensionOrganization">
+        <id column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="team_name" jdbcType="VARCHAR" property="teamName"/>
+        <result column="type" jdbcType="BIGINT" property="type"/>
+        <result column="organization_type" jdbcType="VARCHAR" property="organizationType"/>
+        <result column="organization_code" jdbcType="VARCHAR" property="organizationCode"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="business_scope" jdbcType="VARCHAR" property="businessScope"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="weibo" jdbcType="VARCHAR" property="weibo"/>
+        <result column="official_code" jdbcType="VARCHAR" property="officialCode"/>
+        <result column="website" jdbcType="VARCHAR" property="website"/>
+        <result column="alipay" jdbcType="VARCHAR" property="alipay"/>
+        <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="profile" jdbcType="VARCHAR" property="profile"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        user_id, team_name, type, organization_type, organization_code, address, business_scope, email, tel, weibo, official_code, website, alipay, introduction, profile
+    </sql>
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="userExtensionOrganization">
+        select
+        <include refid="Base_Column_List"/>
+        from user_extension_organization
+        where user_id = #{userId,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="selectByEmail" parameterType="java.lang.String" resultMap="userExtensionOrganization">
+        select
+        <include refid="Base_Column_List"/>
+        from user_extension_organization
+        where email = #{email,jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="selectByTel" parameterType="java.lang.String" resultMap="userExtensionOrganization">
+        select
+        <include refid="Base_Column_List"/>
+        from user_extension_organization
+        where tel = #{tel,jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+
+
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        delete
+        from user_extension_organization
+        where user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="user_id" keyProperty="userId"
+            parameterType="com.stackfarm.esports.pojo.user.UserExtensionOrganization">
+        insert into user_extension_organization (user_id, team_name, type,
+                                    organization_type, organization_code, address, business_scope, email,
+                                    tel, weibo, official_code, website, alipay, introduction, profile)
+        values (#{userId,jdbcType=BIGINT}, #{teamName,jdbcType=VARCHAR}, #{type,jdbcType=BIGINT},
+                #{organizationType,jdbcType=VARCHAR}, #{organizationCode,jdbcType=VARCHAR}, #{address}, #{businessScope,jdbcType=VARCHAR},
+                 #{email,jdbcType=VARCHAR}, #{tel,jdbcType=VARCHAR},
+                 #{weibo,jdbcType=VARCHAR}, #{officialCode,jdbcType=VARCHAR}, #{website,jdbcType=VARCHAR}, #{alipay,jdbcType=VARCHAR}, #{introduction,jdbcType=VARCHAR}, #{profile,jdbcType=VARCHAR})
+    </insert>
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.UserExtensionOrganization">
+        update user_extension_organization
+        set team_name = #{teamName,jdbcType=BIGINT},
+            type = #{type,jdbcType=BIGINT},
+            organization_type = #{organizationType,jdbcType=VARCHAR},
+            organization_code = #{organizationCode,jdbcType=VARCHAR},
+            address = #{address,jdbcType=VARCHAR},
+            business_scope = #{businessScope,jdbcType=VARCHAR},
+            email = #{email,jdbcType=VARCHAR},
+            tel = #{tel,jdbcType=VARCHAR},
+            weibo = #{weibo,jdbcType=VARCHAR},
+            official_code = #{officialCode,jdbcType=VARCHAR},
+            website = #{website,jdbcType=VARCHAR},
+            alipay = #{alipay,jdbcType=VARCHAR},
+            introduction = #{introduction,jdbcType=VARCHAR},
+            profile = #{profile,jdbcType=VARCHAR}
+        where user_id = #{userId,jdbcType=BIGINT}
+    </update>
+</mapper>

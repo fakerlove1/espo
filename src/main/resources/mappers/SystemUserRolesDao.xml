@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.SystemUserRolesDao">
+    <resultMap id="SystemUserRoles" type="com.stackfarm.esports.pojo.user.SystemUserRoles">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="created_time" jdbcType="BIGINT" property="createdTime"/>
+        <result column="updated_time" jdbcType="BIGINT" property="updatedTime"/>
+        <result column="is_available" jdbcType="BOOLEAN" property="isAvailable"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="role_id" jdbcType="BIGINT" property="roleId"/>
+    </resultMap>
+
+    <delete id="realDeleteByUserId">
+        delete
+        from system_user_roles
+        where user_id = #{userId}
+    </delete>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="SystemUserRoles">
+        select *
+        from system_user_roles
+        where id = #{id,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="selectListByUserId" resultMap="SystemUserRoles">
+        select *
+        from system_user_roles
+        where user_id = #{userId}
+        and is_available = true
+    </select>
+
+    <select id="selectListByRoleId" resultMap="SystemUserRoles">
+        select *
+        from system_user_roles
+        where role_id = #{roleId}
+        and is_available = true
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Long">
+        update
+            system_user_roles
+        set is_available = false
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="deleteByUserId" parameterType="java.lang.Long">
+        update
+            system_user_roles
+        set is_available = false
+        where user_id = #{userId}
+    </update>
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.stackfarm.esports.pojo.user.SystemUserRoles" useGeneratedKeys="true">
+        insert into system_user_roles (created_time, updated_time, is_available, user_id, role_id)
+        values (#{createdTime,jdbcType=BIGINT}, #{updatedTime,jdbcType=BIGINT}, #{isAvailable,jdbcType=BOOLEAN},
+                #{userId,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.SystemUserRoles">
+        update system_user_roles
+        set created_time = #{createdTime,jdbcType=BIGINT},
+            updated_time = #{updatedTime,jdbcType=BIGINT},
+            is_available = #{isAvailable,jdbcType=BOOLEAN},
+            user_id      = #{userId,jdbcType=BIGINT},
+            role_id      = #{roleId,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+</mapper>

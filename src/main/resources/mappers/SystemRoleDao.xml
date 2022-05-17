@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.SystemRoleDao">
+    <resultMap id="SystemRole" type="com.stackfarm.esports.pojo.user.SystemRole">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="CHAR" property="name"/>
+        <result column="desc" jdbcType="VARCHAR" property="desc"/>
+        <result column="is_available" jdbcType="BOOLEAN" property="isAvailable"/>
+    </resultMap>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="SystemRole">
+        select * from system_role
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByName" resultMap="SystemRole">
+        select *
+        from system_role where name = #{name}
+    </select>
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.stackfarm.esports.pojo.user.SystemRole" useGeneratedKeys="true">
+        insert into system_role (`name`, `desc`, is_available)
+        values (#{name,jdbcType=CHAR}, #{desc,jdbcType=VARCHAR}, #{isAvailable,jdbcType=BOOLEAN})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from system_role
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.SystemRole">
+        update system_role
+        set `name`       = #{name,jdbcType=CHAR},
+            `desc`       = #{desc,jdbcType=VARCHAR},
+            is_available = #{isAvailable,jdbcType=BOOLEAN}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

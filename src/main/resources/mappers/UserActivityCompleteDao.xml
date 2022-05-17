@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.UserActivityCompleteDao">
+    <resultMap id="userActivityComplete" type="com.stackfarm.esports.pojo.user.UserActivityComplete">
+        <id column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="act_id" jdbcType="BIGINT" property="actId"/>
+        <result column="state" jdbcType="TINYINT" property="state"/>
+        <result column="comment" jdbcType="VARCHAR" property="comment"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        user_id, act_id, state, comment
+    </sql>
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="userActivityComplete">
+        select
+        <include refid="Base_Column_List"/>
+        from user_activity_complete
+        where user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByActId" parameterType="java.lang.String" resultMap="userActivityComplete">
+        select
+        <include refid="Base_Column_List"/>
+        from user_activity_complete
+        where act_id = #{actId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByUserIdAndActId" parameterType="java.lang.String" resultMap="userActivityComplete">
+        select
+        <include refid="Base_Column_List"/>
+        from user_activity_complete
+        where user_id = #{userId,jdbcType=BIGINT} and act_id = #{actId,jdbcType=BIGINT}
+    </select>
+
+
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        delete
+        from user_activity_complete
+        where user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" keyColumn="user_id" keyProperty="userId"
+            parameterType="com.stackfarm.esports.pojo.user.UserActivityComplete">
+        insert into user_activity_complete (user_id, act_id, state, comment)
+        values (#{userId,jdbcType=BIGINT}, #{actId,jdbcType=BIGINT}, #{state,jdbcType=TINYINT}, #{comment,jdbcType=VARCHAR})
+    </insert>
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.UserActivityComplete">
+        update user_activity_complete
+        set state = #{state,jdbcType=TINYINT}, comment = #{comment,jdbcType=VARCHAR}
+        where user_id = #{userId,jdbcType=BIGINT} and act_id = #{actId,jdbcType=BIGINT}
+    </update>
+</mapper>

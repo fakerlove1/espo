@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.SystemUserDao">
+    <resultMap id="SystemUser" type="com.stackfarm.esports.pojo.user.SystemUser">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="username" jdbcType="CHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="salt" jdbcType="VARCHAR" property="salt"/>
+        <result column="role" jdbcType="VARCHAR" property="role"/>
+        <result column="state" jdbcType="BOOLEAN" property="state"/>
+        <result column="cause" jdbcType="VARCHAR" property="cause"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.stackfarm.esports.pojo.user.SystemUser" useGeneratedKeys="true">
+        insert into system_user (username, password, nickname, salt, role, state, cause, create_time, update_time)
+        values (#{username,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR},
+                #{salt,jdbcType=VARCHAR},  #{role,jdbcType=VARCHAR}, #{state,jdbcType=BOOLEAN},
+                 #{cause,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT})
+    </insert>
+
+    <update id="deleteById" parameterType="java.lang.Long">
+        update
+            system_user
+        set state = false
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="realDeleteByUserId" parameterType="java.lang.Long">
+        delete
+        from system_user
+        where id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.SystemUser">
+        update system_user
+        set username   = #{username,jdbcType=CHAR},
+            `password` = #{password,jdbcType=VARCHAR},
+            nickname   = #{nickname,jdbcType=VARCHAR},
+            salt       = #{salt,jdbcType=VARCHAR},
+            `role`    = #{role,jdbcType=VARCHAR},
+            `state`    = #{state,jdbcType=BOOLEAN},
+            cause    = #{cause,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=BIGINT},
+            update_time = #{updateTime,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="SystemUser">
+        select * from system_user where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAll" resultMap="SystemUser">
+        select * from system_user
+    </select>
+
+    <select id="selectByState" resultMap="SystemUser">
+        select * from system_user
+        where state = #{state}
+    </select>
+
+    <select id="selectByUsername" resultMap="SystemUser">
+        select * from system_user
+        where username = #{username}
+    </select>
+
+    <select id="selectByRoleAndPageAndNumber" resultMap="SystemUser">
+        select * from system_user
+        where role = #{roleId} order by update_time desc
+        limit #{page}, #{number}
+    </select>
+
+    <select id="selectByRoleAndUsernameAndPageAndNumber" resultMap="SystemUser">
+        select * from system_user
+        where role = #{roleId} and username like "%"#{username}"%" order by update_time desc
+        limit #{page}, #{number}
+    </select>
+
+    <select id="selectByRole" resultType="java.lang.Integer">
+        select count(*) from system_user
+        where role = #{roleId}
+    </select>
+
+    <select id="selectByStateAndUsername" resultMap="SystemUser">
+        select * from system_user
+        where state = #{state} and username like "%"#{username}"%" order by update_time desc
+    </select>
+</mapper>

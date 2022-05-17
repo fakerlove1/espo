@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.user.UserDarkroomDao">
+    <resultMap id="UserDarkroom" type="com.stackfarm.esports.pojo.user.UserDarkroom">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="time" jdbcType="BIGINT" property="time"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="cause" jdbcType="VARCHAR" property="cause"/>
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.stackfarm.esports.pojo.user.UserDarkroom" useGeneratedKeys="true">
+        insert into user_darkroom (id, user_id, `time`, create_time, cause)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{time,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{cause,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        delete
+        from user_darkroom
+        where user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.user.UserDarkroom">
+        update user_darkroom
+        set user_id         = #{userId,jdbcType=BIGINT},
+            `time`          = #{time,jdbcType=BIGINT},
+            create_time     = #{createTime,jdbcType=BIGINT},
+            cause           = #{cause,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="UserDarkroom">
+        select *
+        from user_darkroom
+        where user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+</mapper>

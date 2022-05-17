@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.authentication.MemberAuthenticationDao">
+    <resultMap id="MemberAuthentication" type="com.stackfarm.esports.pojo.authorize.MemberAuthentication">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="birth" jdbcType="VARCHAR" property="birth"/>
+        <result column="project" jdbcType="VARCHAR" property="project"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="level" jdbcType="VARCHAR" property="level"/>
+        <result column="club" jdbcType="VARCHAR" property="club"/>
+        <result column="club_type" jdbcType="VARCHAR" property="clubType"/>
+        <result column="enroll_application" jdbcType="VARCHAR" property="enrollApplication"/>
+        <result column="qualification_protocol" jdbcType="VARCHAR" property="qualificationProtocol"/>
+        <result column="agreement" jdbcType="VARCHAR" property="agreement"/>
+        <result column="idcard" jdbcType="VARCHAR" property="idcard"/>
+        <result column="photo" jdbcType="VARCHAR" property="photo"/>
+        <result column="extra_evidence" jdbcType="VARCHAR" property="extraEvidence"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="check_time" jdbcType="BIGINT" property="checkTime"/>
+        <result column="effective_time" jdbcType="BIGINT" property="effectiveTime"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="number" jdbcType="VARCHAR" property="number"/>
+        <result column="idcard_number" jdbcType="VARCHAR" property="idcardNumber"/>
+        <result column="origin" jdbcType="VARCHAR" property="origin"/>
+        <result column="other_file_zip" jdbcType="VARCHAR" property="otherFileZip"/>
+        <result column="card_type" jdbcType="VARCHAR" property="cardType"/>
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.stackfarm.esports.pojo.authorize.MemberAuthentication" useGeneratedKeys="true">
+        insert into member_authentication (name, sex, birth, project, type, level, club, club_type, enroll_application, qualification_protocol, agreement, idcard, photo, extra_evidence, create_time, update_time, check_time, effective_time, state, number, idcard_number, origin, other_file_zip, card_type)
+        values (#{name,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{birth,jdbcType=VARCHAR},
+                #{project,jdbcType=VARCHAR},  #{type,jdbcType=VARCHAR}, #{level,jdbcType=VARCHAR},
+                 #{club,jdbcType=VARCHAR}, #{clubType,jdbcType=VARCHAR}, #{enrollApplication,jdbcType=VARCHAR}, #{qualificationProtocol,jdbcType=VARCHAR}, #{agreement,jdbcType=VARCHAR}, #{idcard,jdbcType=VARCHAR}, #{photo,jdbcType=VARCHAR}, #{extraEvidence,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{checkTime,jdbcType=BIGINT}, #{effectiveTime,jdbcType=BIGINT}, #{state,jdbcType=VARCHAR}, #{number,jdbcType=VARCHAR}, #{idcardNumber,jdbcType=VARCHAR}, #{origin,jdbcType=VARCHAR}, #{otherFileZip,jdbcType=VARCHAR}, #{cardType,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="logoutById" parameterType="java.lang.Long">
+        update member_authentication
+            set state = 'LOGOUT'
+            where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.authorize.MemberAuthentication">
+        update member_authentication
+        set name   = #{name,jdbcType=VARCHAR},
+            sex = #{sex,jdbcType=VARCHAR},
+            birth   = #{birth,jdbcType=VARCHAR},
+            project       = #{project,jdbcType=VARCHAR},
+            `type`    = #{type,jdbcType=VARCHAR},
+            `level`    = #{level,jdbcType=VARCHAR},
+            club    = #{club,jdbcType=VARCHAR},
+            club_type    = #{clubType,jdbcType=VARCHAR},
+            enroll_application    = #{enrollApplication,jdbcType=VARCHAR},
+            qualification_protocol    = #{qualificationProtocol,jdbcType=VARCHAR},
+            agreement    = #{agreement,jdbcType=VARCHAR},
+            idcard    = #{idcard,jdbcType=VARCHAR},
+            photo    = #{photo,jdbcType=VARCHAR},
+            extra_evidence    = #{extraEvidence,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=BIGINT},
+            update_time = #{updateTime,jdbcType=BIGINT},
+            check_time = #{checkTime,jdbcType=BIGINT},
+            effective_time = #{effectiveTime,jdbcType=BIGINT},
+            state = #{state,jdbcType=VARCHAR},
+            number = #{number,jdbcType=VARCHAR},
+            idcard_number = #{idcardNumber,jdbcType=VARCHAR},
+            origin = #{origin,jdbcType=VARCHAR},
+            other_file_zip = #{otherFileZip,jdbcType=VARCHAR},
+            card_type = #{cardType,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="MemberAuthentication">
+        select * from member_authentication where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByClubAndIdNumber" resultMap="MemberAuthentication">
+        select * from member_authentication where club = #{club,jdbcType=VARCHAR} and idcard_number = #{idcardNumber,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByNameAndClub" resultMap="MemberAuthentication">
+        select * from member_authentication where `name` = #{name,jdbcType=VARCHAR} and club = #{club,jdbcType=VARCHAR}
+            and state != 'LOGOUT'
+            order by create_time desc
+    </select>
+
+    <select id="selectByClub" resultMap="MemberAuthentication">
+        select * from member_authentication where club = #{club,jdbcType=VARCHAR}
+            order by create_time desc
+    </select>
+
+    <select id="selectAuthorizedByClub" resultMap="MemberAuthentication">
+        select * from member_authentication where club = #{club,jdbcType=VARCHAR} and (state='LOGOUTING' or state='AUTHORIZED')
+            order by create_time desc
+    </select>
+
+    <select id="selectAuthorizedByClubAndType" resultMap="MemberAuthentication">
+        select * from member_authentication where club = #{club,jdbcType=VARCHAR} and type like concat('%',#{type}) and (state='LOGOUTING' or state='AUTHORIZED')
+            order by create_time desc
+    </select>
+
+    <select id="selectByStateAndType" resultMap="MemberAuthentication">
+        select * from member_authentication
+        where state = #{state} and type like concat('%',#{type})
+    </select>
+
+    <select id="selectByStatePlus" resultMap="MemberAuthentication">
+        select * from member_authentication
+        where state = #{state1} or state = #{state2}
+    </select>
+
+    <select id="selectExpired" parameterType="java.lang.Long" resultMap="MemberAuthentication">
+        select * from member_authentication
+            where effective_time <![CDATA[ < ]]> #{standardDate,jdbcType=BIGINT} and state != 'LOGOUT'
+    </select>
+
+    <select id="selectUnexpired" parameterType="java.lang.Long" resultMap="MemberAuthentication">
+        select * from member_authentication
+            where effective_time <![CDATA[ >= ]]> #{standardDate,jdbcType=BIGINT} and state != 'LOGOUT'
+    </select>
+
+    <select id="selectAll" resultMap="MemberAuthentication">
+        select * from member_authentication where state != 'LOGOUT'
+    </select>
+
+    <select id="selectByNameAndSexAndBirth" resultMap="MemberAuthentication">
+        select * from member_authentication where `name` = #{name,jdbcType=VARCHAR} and sex = #{sex,jdbcType=VARCHAR} and birth = #{birth,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByClubAndState" resultMap="MemberAuthentication">
+        select * from member_authentication where club = #{club} and state = #{state}
+    </select>
+
+    <select id="selectByClubAndStateAndType" resultMap="MemberAuthentication">
+        select * from member_authentication where club = #{club} and state = #{state} and type like concat('%',#{type})
+    </select>
+
+    <select id="selectAuthorizedByTypeAndProjectAndLevelAndYear" resultMap="MemberAuthentication">
+        select * from member_authentication where type = #{type} and project = #{project}
+         and level = #{level} and year(from_unixtime(check_time/1000)) = #{year} and state = 'AUTHORIZED';
+    </select>
+
+    <select id="selectAllClubContainsPlayer" resultType="java.lang.String">
+        select distinct club from member_authentication where type like '%PLAYER'
+    </select>
+
+
+
+</mapper>

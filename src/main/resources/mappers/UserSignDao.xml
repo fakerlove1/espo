@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stackfarm.esports.dao.sign.UserSignDao">
+    <resultMap id="UserSign" type="com.stackfarm.esports.pojo.sign.UserSign">
+        <id column="id" jdbcType="BIGINT" property="Id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="act_id" jdbcType="BIGINT" property="actId"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="state" jdbcType="TINYINT" property="state"/>
+    </resultMap>
+
+
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.stackfarm.esports.pojo.sign.UserSign" useGeneratedKeys="true">
+        insert into user_sign (user_id, act_id, state, create_time)
+        values (#{userId,jdbcType=BIGINT}, #{actId,jdbcType=BIGINT}, #{state,jdbcType=TINYINT}, #{createTime,jdbcType=BIGINT})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from user_sign
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.stackfarm.esports.pojo.sign.UserSign">
+        update user_sign
+        set state       = #{state,jdbcType=TINYINT},
+            create_time = #{createTime,jdbcType=TINYINT}
+        where user_id = #{userId,jdbcType=BIGINT} and act_id = #{actId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByUserIdAndActId" resultMap="UserSign">
+        select * from user_sign where user_id = #{userId,jdbcType=BIGINT} and act_id = #{actId,jdbcType=BIGINT}
+    </select>
+</mapper>
