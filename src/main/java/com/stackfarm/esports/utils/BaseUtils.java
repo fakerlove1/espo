@@ -316,55 +316,55 @@ public class BaseUtils {
     /**
      * 更新对象的私有域的值
      */
-    public static void updateObject(Object o, Map<String, String> params) throws UnhandledException {
-        Field[] fields = o.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (Modifier.isFinal(field.getModifiers())) {
-                continue;
-            }
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            boolean isAccess = field.canAccess(o);
-            if (!isAccess) {
-                field.setAccessible(true);
-            }
-            String valName = field.getName();
-            String value = params.get(valName);
-            if (value != null && !"".equals(value)) {
-                Class<?> clazz = field.getType();
-                try {
-                    if (Long.class.getName().equals(clazz.getName())) {
-                        field.set(o, Long.parseLong(value));
-                    } else if (String.class.getName().equals(clazz.getName())) {
-                        field.set(o, value);
-                    } else if (Double.class.getName().equals(clazz.getName())) {
-                        field.set(o, Double.parseDouble(valName));
-                    } else if (Integer.class.getName().equals(clazz.getName())) {
-                        field.set(o, Integer.parseInt(value));
-                    } else if (Boolean.class.getName().equals(clazz.getName())) {
-                        field.set(o, Boolean.parseBoolean(value));
-                    } else if (Short.class.getName().equals(clazz.getName())) {
-                        field.set(o, Short.parseShort(value));
-                    } else if (Float.class.getName().equals(clazz.getName())) {
-                        field.set(o, Float.parseFloat(value));
-                    } else if (Date.class.getName().equals(clazz.getName())) {
-                        field.set(o, new Date(Long.parseLong(value)));
-                    } else {
-                        field.set(o, objectMapper.readValue(value, clazz));
-                    }
-                } catch (IllegalAccessException | JsonProcessingException e) {
-                    throw new UnhandledException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            "设置对象域" + valName + "失败",
-                            BaseUtils.getRunLocation(Thread.currentThread().getStackTrace()[1]),
-                            new Date());
-                }
-            }
-            if (!isAccess) {
-                field.setAccessible(false);
-            }
-        }
-    }
+//    public static void updateObject(Object o, Map<String, String> params) throws UnhandledException {
+//        Field[] fields = o.getClass().getDeclaredFields();
+//        for (Field field : fields) {
+//            if (Modifier.isFinal(field.getModifiers())) {
+//                continue;
+//            }
+//            if (Modifier.isStatic(field.getModifiers())) {
+//                continue;
+//            }
+//            boolean isAccess = field.canAccess(o);
+//            if (!isAccess) {
+//                field.setAccessible(true);
+//            }
+//            String valName = field.getName();
+//            String value = params.get(valName);
+//            if (value != null && !"".equals(value)) {
+//                Class<?> clazz = field.getType();
+//                try {
+//                    if (Long.class.getName().equals(clazz.getName())) {
+//                        field.set(o, Long.parseLong(value));
+//                    } else if (String.class.getName().equals(clazz.getName())) {
+//                        field.set(o, value);
+//                    } else if (Double.class.getName().equals(clazz.getName())) {
+//                        field.set(o, Double.parseDouble(valName));
+//                    } else if (Integer.class.getName().equals(clazz.getName())) {
+//                        field.set(o, Integer.parseInt(value));
+//                    } else if (Boolean.class.getName().equals(clazz.getName())) {
+//                        field.set(o, Boolean.parseBoolean(value));
+//                    } else if (Short.class.getName().equals(clazz.getName())) {
+//                        field.set(o, Short.parseShort(value));
+//                    } else if (Float.class.getName().equals(clazz.getName())) {
+//                        field.set(o, Float.parseFloat(value));
+//                    } else if (Date.class.getName().equals(clazz.getName())) {
+//                        field.set(o, new Date(Long.parseLong(value)));
+//                    } else {
+//                        field.set(o, objectMapper.readValue(value, clazz));
+//                    }
+//                } catch (IllegalAccessException | JsonProcessingException e) {
+//                    throw new UnhandledException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                            "设置对象域" + valName + "失败",
+//                            BaseUtils.getRunLocation(Thread.currentThread().getStackTrace()[1]),
+//                            new Date());
+//                }
+//            }
+//            if (!isAccess) {
+//                field.setAccessible(false);
+//            }
+//        }
+//    }
 
     /**
      * 获取对象所有私有域的值

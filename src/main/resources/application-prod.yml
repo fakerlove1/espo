@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:mysql://rm-uf682626j42h0nn6ljo.mysql.rds.aliyuncs.com:3306/esport?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: zhou
+    password: 123qweQWE
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  redis:
+    host: r-uf6acdf640d31d04pd.redis.rds.aliyuncs.com
+    port: 6379
+    password: 123qweQWE
+    database: 0
+    timeout: 3000
+
+  config:
+    activate:
+      on-profile: prod
+# 文件保存根路径
+fileRootPath: /home/E-Sports
+#打包文件暂存地址
+zipFileTemporaryPath: /home/E-Sports/temporary
+#二维码保存地址
+qrCodePath: /home/E-Sports/qrcode
+
+server:
+  port: 9000

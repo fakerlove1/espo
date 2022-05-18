@@ -17,6 +17,7 @@ import com.stackfarm.esports.system.*;
 import com.stackfarm.esports.utils.BaseUtils;
 import com.stackfarm.esports.utils.FileUtils;
 import com.stackfarm.esports.utils.JwtUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 @Service
 @Transactional
+@Slf4j
 public class OrganizationActivitiesServiceImpl implements OrganizationActivitiesService {
 
     private final ActivityDao activityDao;
@@ -86,48 +88,49 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 发布活动（企业/俱乐部专用）
-     * @param actName 活动名
-     * @param actType 活动类型（如线下赛事）
+     *
+     * @param actName         活动名
+     * @param actType         活动类型（如线下赛事）
      * @param enrollBeginTime 报名开始时间
-     * @param enrollEndTime 报名截止时间
-     * @param holdBeginTime 活动开始时间
-     * @param holdEndTime   活动截止时间
-     * @param staffTypes    活动人员类别
-     * @param staffCount    活动人员类别数量
-     * @param jobRequirement    活动岗位要求
-     * @param cost  报名费用
-     * @param reward    活动奖金
-     * @param actAddress    活动地点
-     * @param detailAddress 详细地址
-     * @param contactWay    活动报名联系方式
-     * @param actScope  活动面向对象
-     * @param actInformation    活动简介
-     * @param poster    活动海报
-     * @param pictures   活动组图
-     * @param actPlan 活动企划书
+     * @param enrollEndTime   报名截止时间
+     * @param holdBeginTime   活动开始时间
+     * @param holdEndTime     活动截止时间
+     * @param staffTypes      活动人员类别
+     * @param staffCount      活动人员类别数量
+     * @param jobRequirement  活动岗位要求
+     * @param cost            报名费用
+     * @param reward          活动奖金
+     * @param actAddress      活动地点
+     * @param detailAddress   详细地址
+     * @param contactWay      活动报名联系方式
+     * @param actScope        活动面向对象
+     * @param actInformation  活动简介
+     * @param poster          活动海报
+     * @param pictures        活动组图
+     * @param actPlan         活动企划书
      * @return
      */
     @Override
     public ResultBean<Void> launchActivity(String token, String actName, String actType, Long enrollBeginTime,
-                                        Long enrollEndTime, Long holdBeginTime, Long holdEndTime,
-                                        String staffTypes, String staffCount, String jobRequirement,
-                                        BigDecimal cost, BigDecimal reward, String actAddress, String detailAddress,
-                                        String contactWay, String actScope, String actInformation,
-                                        MultipartFile poster, MultipartFile[] pictures, MultipartFile actPlan) throws UnhandledException, IOException {
+                                           Long enrollEndTime, Long holdBeginTime, Long holdEndTime,
+                                           String staffTypes, String staffCount, String jobRequirement,
+                                           BigDecimal cost, BigDecimal reward, String actAddress, String detailAddress,
+                                           String contactWay, String actScope, String actInformation,
+                                           MultipartFile poster, MultipartFile[] pictures, MultipartFile actPlan) throws UnhandledException, IOException {
         ResultBean<Void> result = new ResultBean<>();
         Long launcherId = systemUserDao.selectByUsername(JwtUtils.getUserName(token)).getId();
 
         //被拉进小黑屋的人不允许报名活动
         UserDarkroom userDarkroom = userDarkroomDao.selectByUserId(launcherId);
-        if(userDarkroom != null) {
-            if(BaseUtils.isDarkRoom(userDarkroom.getTime(), userDarkroom.getCreateTime())) {
+        if (userDarkroom != null) {
+            if (BaseUtils.isDarkRoom(userDarkroom.getTime(), userDarkroom.getCreateTime())) {
                 //time<0表示永久拉黑
                 UnhandledException unhandledException = new UnhandledException();
-                if(userDarkroom.getTime() < 0) {
+                if (userDarkroom.getTime() < 0) {
                     unhandledException.setMsg("您已经被永久封禁,有疑惑请联系管理员");
                 } else {
                     unhandledException.setMsg("您已进入黑名单无法发布活动,还剩" + BaseUtils.calculateDarkRoom(userDarkroom.getTime(), userDarkroom.getCreateTime())
-                            +"解封，如有疑惑请联系管理员！");
+                            + "解封，如有疑惑请联系管理员！");
                 }
                 unhandledException.setHttpStatus(HttpStatus.BAD_REQUEST.value());
                 unhandledException.setLocation(BaseUtils.getRunLocation(Thread.currentThread().getStackTrace()[1]));
@@ -140,14 +143,13 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         }
 
 
-
         //设置为活动名称不重复,因为同一机构不允许申请同名活动（除非活动已经撤销）
-        if(activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.CHECKING) != null ||
+        if (activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.CHECKING) != null ||
                 activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.ACCESS) != null ||
                 activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.ENROLLING) != null ||
                 activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.ENROLL_CLOSED) != null ||
                 activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.HOLDING) != null ||
-                activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.ENDED) != null ) {
+                activityDao.selectByActNameAndUserIdAndState(actName, launcherId, ActivityStateConstant.ENDED) != null) {
             UnhandledException unhandledException = new UnhandledException();
             unhandledException.setMsg("请不要申请同名活动");
             unhandledException.setHttpStatus(HttpStatus.BAD_REQUEST.value());
@@ -156,7 +158,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
             throw unhandledException;
         }
         //判断开始时间要在报名截止时间之后
-        if(enrollEndTime >= holdBeginTime) {
+        if (enrollEndTime >= holdBeginTime) {
             UnhandledException unhandledException = new UnhandledException();
             unhandledException.setMsg("活动开始时间请不要在报名截止时间之前");
             unhandledException.setHttpStatus(HttpStatus.BAD_REQUEST.value());
@@ -173,24 +175,24 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
                 + File.separatorChar + currentUser.getUsername() + File.separatorChar + actName
                 + File.separatorChar + "POSTER_IMG" + File.separatorChar + newPosterFileName;
         String picturePath = null;
-        if(pictures != null && pictures.length != 0) {
+        if (pictures != null && pictures.length != 0) {
             StringBuilder sb = new StringBuilder();
             Integer number = 1;
-            for (MultipartFile file: pictures) {
+            for (MultipartFile file : pictures) {
                 String pictureFileName = file.getOriginalFilename();
                 String newPictureFileName = JwtUtils.getUserName(token) + " 活动组图(" + number + ")" + pictureFileName.substring(pictureFileName.lastIndexOf("."));
                 number++;
                 String p = SystemConstant.FILE_ROOT_PATH + File.separatorChar + "APPLY_ACTIVITY"
                         + File.separatorChar + currentUser.getUsername() + File.separatorChar + actName
                         + File.separatorChar + "PICTURE_IMG" + File.separatorChar + newPictureFileName;
-                sb.append(p+";");
+                sb.append(p + ";");
                 Path picturePathFile = FileUtils.forceCreateFile(p);
                 file.transferTo(picturePathFile);
             }
             picturePath = sb.toString();
         }
         String planPath = null;
-        if(actPlan != null) {
+        if (actPlan != null) {
             String planFileName = actPlan.getOriginalFilename();
             String newPlanFileName = JwtUtils.getUserName(token) + " 活动计划书" + planFileName.substring(planFileName.lastIndexOf("."));
             planPath = SystemConstant.FILE_ROOT_PATH + File.separatorChar + "APPLY_ACTIVITY"
@@ -200,7 +202,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         try {
             Path posterPathFile = FileUtils.forceCreateFile(posterPath);
             poster.transferTo(posterPathFile);
-            if(actPlan != null) {
+            if (actPlan != null) {
                 Path actPlanPathFile = FileUtils.forceCreateFile(planPath);
                 actPlan.transferTo(actPlanPathFile);
             }
@@ -257,17 +259,18 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 撤销活动（企业/俱乐部专有）
-     * @param actId 活动Id
+     *
+     * @param actId  活动Id
      * @param reason 撤销原因
      * @return
      */
     @Override
-    public ResultBean<Void> cancelActivity(Long actId ,String reason) {
+    public ResultBean<Void> cancelActivity(Long actId, String reason) {
         ResultBean<Void> result = new ResultBean<>();
 
         Activity activity = activityDao.selectById(actId);
         //如果活动处于待审核/审核失败中，让活动状态直接取消
-        if(activity.getState().equals(ActivityStateConstant.CHECKING) || activity.getState().equals(ActivityStateConstant.FAILED)) {
+        if (activity.getState().equals(ActivityStateConstant.CHECKING) || activity.getState().equals(ActivityStateConstant.FAILED)) {
             activity.setState(ActivityStateConstant.CANCELED);
             result.setMsg("撤销成功");
 
@@ -288,6 +291,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 查看某一活动详情（企业/俱乐部专有）
+     *
      * @param actId 活动ID
      * @return
      */
@@ -301,14 +305,14 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         //更新已通过活动的时间状态
         activityService.updateActState(activity);
 
-        ActivityBean activityBean = new ActivityBean(actId, activity.getName(),activity.getLauncherId(),
-                activity.getLaunchedTime(),activity.getBeginTime(),activity.getEndTime(),activity.getEnrollBeginTime(),
-                activity.getEnrollEndTime(),activity.getScope(),activity.getTypes(),activity.getLocation(),
-                activity.getDetailedLocation(),activity.getLevel(),activity.getNote(),activity.getSizeOfPeople(),
-                activity.getState(),activity.getParticipateIds(),activityExtension.getStaffTypes(),
-                activityExtension.getStaffTypesCount(),activityExtension.getRequirement(), activityExtension.getCost(),
-                activityExtension.getReward(), activityExtension.getPoint(),activityExtension.getContactWay(),
-                activityExtension.getIntroduction(),FileUtils.hidePath(activityExtension.getPoster()),FileUtils.hidePaths(activityExtension.getPicture()),
+        ActivityBean activityBean = new ActivityBean(actId, activity.getName(), activity.getLauncherId(),
+                activity.getLaunchedTime(), activity.getBeginTime(), activity.getEndTime(), activity.getEnrollBeginTime(),
+                activity.getEnrollEndTime(), activity.getScope(), activity.getTypes(), activity.getLocation(),
+                activity.getDetailedLocation(), activity.getLevel(), activity.getNote(), activity.getSizeOfPeople(),
+                activity.getState(), activity.getParticipateIds(), activityExtension.getStaffTypes(),
+                activityExtension.getStaffTypesCount(), activityExtension.getRequirement(), activityExtension.getCost(),
+                activityExtension.getReward(), activityExtension.getPoint(), activityExtension.getContactWay(),
+                activityExtension.getIntroduction(), FileUtils.hidePath(activityExtension.getPoster()), FileUtils.hidePaths(activityExtension.getPicture()),
                 FileUtils.hidePath(activityExtension.getPlan()));
 
         result.setStatus(HttpStatus.OK.value());
@@ -320,11 +324,12 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 报名活动
-     * @param actId 活动id
-     * @param teamName 小队名称
+     *
+     * @param actId               活动id
+     * @param teamName            小队名称
      * @param preferPositionCount 参加人数
-     * @param preferPosition 倾向的岗位
-     * 还没有设置不允许重复参加
+     * @param preferPosition      倾向的岗位
+     *                            还没有设置不允许重复参加
      * @return
      */
     @Override
@@ -338,7 +343,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         SystemUser currentUser = systemUserDao.selectByUsername(teamName);
 
         //团体
-        if (UserRolesConstant.CLUB_USER_NUM.equals(BaseUtils.getListFromString(currentUser.getRole()).get(0))||UserRolesConstant.ENTERPRISE_USER_NUM.equals(BaseUtils.getListFromString(currentUser.getRole()).get(0))) {
+        if (UserRolesConstant.CLUB_USER_NUM.equals(BaseUtils.getListFromString(currentUser.getRole()).get(0)) || UserRolesConstant.ENTERPRISE_USER_NUM.equals(BaseUtils.getListFromString(currentUser.getRole()).get(0))) {
             if (userExtensionOrganizationDao.selectByUserId(currentUser.getId()).getEmail() == null && "".equals(userExtensionOrganizationDao.selectByUserId(currentUser.getId()).getEmail())) {
                 UnhandledException unhandledException = new UnhandledException();
                 unhandledException.setMsg("邮箱信息未填写，不可参加活动！");
@@ -363,15 +368,15 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
         //被拉进小黑屋的人不允许报名活动
         UserDarkroom userDarkroom = userDarkroomDao.selectByUserId(currentUser.getId());
-        if(userDarkroom != null) {
-            if(BaseUtils.isDarkRoom(userDarkroom.getTime(), userDarkroom.getCreateTime())) {
+        if (userDarkroom != null) {
+            if (BaseUtils.isDarkRoom(userDarkroom.getTime(), userDarkroom.getCreateTime())) {
                 //time<0表示永久拉黑
                 UnhandledException unhandledException = new UnhandledException();
-                if(userDarkroom.getTime() < 0) {
+                if (userDarkroom.getTime() < 0) {
                     unhandledException.setMsg("您已经被永久封禁,有疑惑请联系管理员");
                 } else {
                     unhandledException.setMsg("您已进入黑名单无法报名活动,还剩" + BaseUtils.calculateDarkRoom(userDarkroom.getTime(), userDarkroom.getCreateTime())
-                            +"解封，如有疑惑请联系管理员！");
+                            + "解封，如有疑惑请联系管理员！");
                 }
                 unhandledException.setHttpStatus(HttpStatus.BAD_REQUEST.value());
                 unhandledException.setLocation(BaseUtils.getRunLocation(Thread.currentThread().getStackTrace()[1]));
@@ -384,7 +389,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         }
 
         //不允许报名自己发布的活动
-        if(activity.getLauncherId() ==  currentUser.getId()) {
+        if (activity.getLauncherId() == currentUser.getId()) {
             UnhandledException unhandledException = new UnhandledException();
             unhandledException.setMsg("请不要报名自己发布的活动");
             unhandledException.setHttpStatus(HttpStatus.BAD_REQUEST.value());
@@ -395,7 +400,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
         //首先需要判断有没有重复报名（被拒绝的也可以重新报名）
         UserActivity userActivityRepeat = userActivityDao.selectByUserIdAndActId(currentUser.getId(), actId);
-        if(userActivityRepeat != null) {
+        if (userActivityRepeat != null) {
             //证明数据库中确实有此报名记录，除了被拒绝或者退出的可以重复报名
             if (userActivityRepeat.getState().equals(UserActivityStateConstant.UNDER_REVIEW) ||
                     userActivityRepeat.getState().equals(UserActivityStateConstant.PASSED) ||
@@ -418,9 +423,9 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         SystemRole role = systemRoleDao.selectById(Long.parseLong(roles.get(0)));
 
         //如果是个人用户，需判断有没有实名认证
-        if(role.getId() == 1) {
+        if (role.getId() == 1) {
             UserInformation userInformation = userInformationDao.selectByUserId(currentUser.getId());
-            if(userInformation.getName() == null || userInformation.getCardId() == null) {
+            if (userInformation.getName() == null || userInformation.getCardId() == null) {
                 UnhandledException unhandledException = new UnhandledException();
                 unhandledException.setMsg("请先去实名认证");
                 unhandledException.setHttpStatus(HttpStatus.BAD_REQUEST.value());
@@ -439,14 +444,14 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         userActivity.setState(UserActivityStateConstant.UNDER_REVIEW);
         userActivity.setStaffType(preferPosition);
 
-        if(role.getId() == 1) {
+        if (role.getId() == 1) {
             //个人参赛preferPosition="导引类;"，preferPositionCount="1"
             userActivity.setMemberCount(1);
         } else {
             //团体参赛 preferPosition="导引类;接引类;"，preferPositionCount="1;2;"
             List<String> roleCount = BaseUtils.getListFromString(preferPositionCount);
             Integer counts = 0;
-            for(int i = 0; i < roleCount.size(); i++) {
+            for (int i = 0; i < roleCount.size(); i++) {
                 counts = counts + Integer.parseInt(roleCount.get(i));
             }
             userActivity.setMemberCount(counts);
@@ -462,8 +467,9 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 退出活动
+     *
      * @param userId 用户id
-     * @param actId 活动id
+     * @param actId  活动id
      * @return
      */
     @Override
@@ -471,7 +477,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         UserActivity userActivity = userActivityDao.selectByUserIdAndActId(userId, actId);
         Activity activity = activityDao.selectById(actId);
         //如果是待审核状态允许退出 或者 活动开始前三天，可以退出报名
-        if(userActivity.getState().equals(UserActivityStateConstant.UNDER_REVIEW) || activity.getBeginTime() - System.currentTimeMillis() >= 3*24*60*60*1000) {
+        if (userActivity.getState().equals(UserActivityStateConstant.UNDER_REVIEW) || activity.getBeginTime() - System.currentTimeMillis() >= 3 * 24 * 60 * 60 * 1000) {
             userActivity.setState(UserActivityStateConstant.SIGN_OUT);
             userActivityDao.update(userActivity);
         } else {
@@ -491,6 +497,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
     /**
      * 查看自己可见范围内可报名活动的信息
      * （只查看正在报名中且本人未报名的活动）
+     *
      * @param userId 用户id
      * @return
      */
@@ -504,18 +511,18 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         List<String> roleList = BaseUtils.getListFromString(roles);
 
         //如果只有一个身份，比如说他只有id=1的角色
-        if(roleList.size() == 1) {
+        if (roleList.size() == 1) {
             SystemRole role = systemRoleDao.selectById(Long.parseLong(roleList.get(0)));
             Long roleId = role.getId();
             //如果是1号就是个人用户，2号企业，3号俱乐部
             String scope = "";
-            if(roleId == 1) {
+            if (roleId == 1) {
                 scope = ActivityScopeConstant.PERSON;
-            } else if(roleId == 2 || roleId == 3) {
+            } else if (roleId == 2 || roleId == 3) {
                 scope = ActivityScopeConstant.GROUP;
             }
             String newName = "";
-            if(name != null) {
+            if (name != null) {
                 newName = name;
             }
             List<Long> activityIdList = activityDao.selectByScope(scope, newName);
@@ -526,8 +533,8 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
                 UserActivity userActivity = userActivityDao.selectByUserIdAndActId(userId, actId);
                 //如果存在userActivity的话，证明已经报名，剔除她
                 //已经退出的活动还可以看吗--->可以
-                if(userActivity != null ) {
-                    if(!userActivity.getState().equals(UserActivityStateConstant.TURN_DOWN) && !userActivity.getState().equals(UserActivityStateConstant.SIGN_OUT)) {
+                if (userActivity != null) {
+                    if (!userActivity.getState().equals(UserActivityStateConstant.TURN_DOWN) && !userActivity.getState().equals(UserActivityStateConstant.SIGN_OUT)) {
                         activityIdList.remove(i);
                         i = i - 1;
                     }
@@ -535,17 +542,17 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
             }
 
             //任何对活动状态进行的操作，都要先进行更新状态
-            for(int i = 0; i < activityIdList.size(); i++) {
+            for (int i = 0; i < activityIdList.size(); i++) {
                 Long actId = activityIdList.get(i);
                 Activity activity = activityDao.selectById(actId);
                 activityService.updateActState(activity);
             }
 
             //并且活动状态要处于正在报名中
-            for(int i = 0; i < activityIdList.size(); i++) {
+            for (int i = 0; i < activityIdList.size(); i++) {
                 Long actId = activityIdList.get(i);
                 Activity activity = activityDao.selectById(actId);
-                if(!activity.getState().equals(ActivityStateConstant.ENROLLING)) {
+                if (!activity.getState().equals(ActivityStateConstant.ENROLLING)) {
                     activityIdList.remove(i);
                     //System.out.println("1111");
                     i = i - 1;
@@ -553,10 +560,10 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
             }
 
             //不看见自己发布的活动
-            for(int i = 0; i < activityIdList.size(); i++) {
+            for (int i = 0; i < activityIdList.size(); i++) {
                 Long actId = activityIdList.get(i);
                 Activity activity = activityDao.selectById(actId);
-                if(activity.getLauncherId() == userId) {
+                if (activity.getLauncherId() == userId) {
                     activityIdList.remove(i);
                     i = i - 1;
                 }
@@ -564,20 +571,20 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
 
             //根据活动id找到每个activity与activityExtension，组成ActivityBean
-            for(int i = 0; i < activityIdList.size(); i++) {
+            for (int i = 0; i < activityIdList.size(); i++) {
                 Long actId = activityIdList.get(i);
                 Activity activity = activityDao.selectById(actId);
                 ActivityExtension activityExtension = activityExtensionDao.selectByActId(actId);
 
 
-                ActivityBean activityBean = new ActivityBean(actId, activity.getName(),activity.getLauncherId(),
-                        activity.getLaunchedTime(),activity.getBeginTime(),activity.getEndTime(),activity.getEnrollBeginTime(),
-                        activity.getEnrollEndTime(),activity.getScope(),activity.getTypes(),activity.getLocation(),
-                        activity.getDetailedLocation(),activity.getLevel(),activity.getNote(),activity.getSizeOfPeople(),
-                        activity.getState(),activity.getParticipateIds(),activityExtension.getStaffTypes(),
-                        activityExtension.getStaffTypesCount(),activityExtension.getRequirement(), activityExtension.getCost(),
-                        activityExtension.getReward(), activityExtension.getPoint(),activityExtension.getContactWay(),
-                        activityExtension.getIntroduction(),FileUtils.hidePath(activityExtension.getPoster()),FileUtils.hidePaths(activityExtension.getPicture()),
+                ActivityBean activityBean = new ActivityBean(actId, activity.getName(), activity.getLauncherId(),
+                        activity.getLaunchedTime(), activity.getBeginTime(), activity.getEndTime(), activity.getEnrollBeginTime(),
+                        activity.getEnrollEndTime(), activity.getScope(), activity.getTypes(), activity.getLocation(),
+                        activity.getDetailedLocation(), activity.getLevel(), activity.getNote(), activity.getSizeOfPeople(),
+                        activity.getState(), activity.getParticipateIds(), activityExtension.getStaffTypes(),
+                        activityExtension.getStaffTypesCount(), activityExtension.getRequirement(), activityExtension.getCost(),
+                        activityExtension.getReward(), activityExtension.getPoint(), activityExtension.getContactWay(),
+                        activityExtension.getIntroduction(), FileUtils.hidePath(activityExtension.getPoster()), FileUtils.hidePaths(activityExtension.getPicture()),
                         FileUtils.hidePath(activityExtension.getPlan()));
 
                 String time = BaseUtils.parseTime(activity.getBeginTime());
@@ -597,16 +604,18 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 用户查看自己全部参与信息情况，包括已通过（活动状态）/未审核等
+     *
      * @param userId 用户id
      * @return
      */
     @Override
     public ResultBean<List<ActEnrollBean>> getUserActInformation(Long userId) {
+        log.info(String.valueOf(userId));
         ResultBean<List<ActEnrollBean>> result = new ResultBean<>();
         List<ActEnrollBean> actEnrollBeans = new LinkedList<>();
         List<UserActivity> userActivityList = userActivityDao.selectByUserId(userId);
-        if(userActivityList.size() != 0) {
-            for(int i = 0; i < userActivityList.size(); i++) {
+        if (userActivityList.size() != 0) {
+            for (int i = 0; i < userActivityList.size(); i++) {
                 //对每一个用户参加的活动进行封装成ActEnrollBean
                 Long actId = userActivityList.get(i).getActId();
                 Activity activity = activityDao.selectById(actId);
@@ -614,22 +623,22 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
                 //对每一个活动状态进行更新
                 activityService.updateActState(activity);
 
-                if(userActivityList.get(i).getCause() != null) {
-                    ActEnrollBean actEnrollBean = new ActEnrollBean(activity.getName(),activity.getBeginTime(),activity.getEndTime(),
-                            activity.getTypes(),activity.getLocation(), activity.getDetailedLocation(),activity.getState(),activityExtension.getStaffTypes(),
+                if (userActivityList.get(i).getCause() != null) {
+                    ActEnrollBean actEnrollBean = new ActEnrollBean(activity.getName(), activity.getBeginTime(), activity.getEndTime(),
+                            activity.getTypes(), activity.getLocation(), activity.getDetailedLocation(), activity.getState(), activityExtension.getStaffTypes(),
                             activityExtension.getStaffTypesCount(), activityExtension.getRequirement(),
-                            activityExtension.getCost(), activityExtension.getReward(),activityExtension.getContactWay(),
-                            activityExtension.getIntroduction(),FileUtils.hidePath(activityExtension.getPoster()),userActivityList.get(i).getState(),
-                            userActivityList.get(i).getCause(),userActivityList.get(i).getStaffType(),userActivityList.get(i).getTeamName()
-                            );
+                            activityExtension.getCost(), activityExtension.getReward(), activityExtension.getContactWay(),
+                            activityExtension.getIntroduction(), FileUtils.hidePath(activityExtension.getPoster()), userActivityList.get(i).getState(),
+                            userActivityList.get(i).getCause(), userActivityList.get(i).getStaffType(), userActivityList.get(i).getTeamName()
+                    );
                     actEnrollBeans.add(actEnrollBean);
                 } else {
-                    ActEnrollBean actEnrollBean = new ActEnrollBean(activity.getName(),activity.getBeginTime(),activity.getEndTime(),
-                            activity.getTypes(),activity.getLocation(), activity.getDetailedLocation(),activity.getState(), activityExtension.getStaffTypes(),
+                    ActEnrollBean actEnrollBean = new ActEnrollBean(activity.getName(), activity.getBeginTime(), activity.getEndTime(),
+                            activity.getTypes(), activity.getLocation(), activity.getDetailedLocation(), activity.getState(), activityExtension.getStaffTypes(),
                             activityExtension.getStaffTypesCount(), activityExtension.getRequirement(),
-                            activityExtension.getCost(), activityExtension.getReward(),activityExtension.getContactWay(),
-                            activityExtension.getIntroduction(),FileUtils.hidePath(activityExtension.getPoster()),userActivityList.get(i).getState(),
-                            "no-cause",userActivityList.get(i).getStaffType(),userActivityList.get(i).getTeamName()
+                            activityExtension.getCost(), activityExtension.getReward(), activityExtension.getContactWay(),
+                            activityExtension.getIntroduction(), FileUtils.hidePath(activityExtension.getPoster()), userActivityList.get(i).getState(),
+                            "no-cause", userActivityList.get(i).getStaffType(), userActivityList.get(i).getTeamName()
                     );
                     actEnrollBeans.add(actEnrollBean);
                 }
@@ -644,6 +653,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 企业查看自己发布的所有活动详情
+     *
      * @param userId 企业用户id
      * @return
      */
@@ -652,8 +662,8 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
         ResultBean<List<ActivityNewBean>> result = new ResultBean<>();
         List<Activity> activities = activityDao.selectListByLauncherId(userId);
         List<ActivityNewBean> activityBeans = new LinkedList<>();
-        if(activities.size() != 0) {
-            for(int i = 0; i < activities.size(); i++) {
+        if (activities.size() != 0) {
+            for (int i = 0; i < activities.size(); i++) {
                 //更新一下活动状态
                 activityService.updateActState(activities.get(i));
 
@@ -661,18 +671,18 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
                 ActivityExtension activityExtension = activityExtensionDao.selectByActId(actId);
                 ActivityUnexpect activityUnexpect = activityUnexpectDao.selectByActId(actId);
                 String cause = "无";
-                if(activityUnexpect != null) {
+                if (activityUnexpect != null) {
                     cause = activityUnexpect.getMessage();
                 }
 
-                ActivityNewBean activityNewBean = new ActivityNewBean(actId, activities.get(i).getName(),activities.get(i).getLauncherId(),
-                        activities.get(i).getLaunchedTime(),activities.get(i).getBeginTime(),activities.get(i).getEndTime(),activities.get(i).getEnrollBeginTime(),
-                        activities.get(i).getEnrollEndTime(),activities.get(i).getScope(),activities.get(i).getTypes(),activities.get(i).getLocation(),
-                        activities.get(i).getDetailedLocation(),activities.get(i).getLevel(),activities.get(i).getNote(),activities.get(i).getSizeOfPeople(),
-                        activities.get(i).getState(),activities.get(i).getParticipateIds(),activityExtension.getStaffTypes(),
-                        activityExtension.getStaffTypesCount(),activityExtension.getRequirement(), activityExtension.getCost(),
-                        activityExtension.getReward(), activityExtension.getPoint(),activityExtension.getContactWay(),
-                        activityExtension.getIntroduction(),FileUtils.hidePath(activityExtension.getPoster()),FileUtils.hidePaths(activityExtension.getPicture()),
+                ActivityNewBean activityNewBean = new ActivityNewBean(actId, activities.get(i).getName(), activities.get(i).getLauncherId(),
+                        activities.get(i).getLaunchedTime(), activities.get(i).getBeginTime(), activities.get(i).getEndTime(), activities.get(i).getEnrollBeginTime(),
+                        activities.get(i).getEnrollEndTime(), activities.get(i).getScope(), activities.get(i).getTypes(), activities.get(i).getLocation(),
+                        activities.get(i).getDetailedLocation(), activities.get(i).getLevel(), activities.get(i).getNote(), activities.get(i).getSizeOfPeople(),
+                        activities.get(i).getState(), activities.get(i).getParticipateIds(), activityExtension.getStaffTypes(),
+                        activityExtension.getStaffTypesCount(), activityExtension.getRequirement(), activityExtension.getCost(),
+                        activityExtension.getReward(), activityExtension.getPoint(), activityExtension.getContactWay(),
+                        activityExtension.getIntroduction(), FileUtils.hidePath(activityExtension.getPoster()), FileUtils.hidePaths(activityExtension.getPicture()),
                         FileUtils.hidePath(activityExtension.getPlan()), cause);
                 activityBeans.add(activityNewBean);
             }
@@ -686,6 +696,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
     /**
      * 企业查看某一活动的报名人员信息
+     *
      * @param actId 活动id
      * @return
      */
@@ -696,7 +707,7 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
 
         Activity activity = activityDao.selectById(actId);
         List<String> userIdList = BaseUtils.getListFromString(activity.getParticipateIds());
-        if(userIdList.size() != 0) {
+        if (userIdList.size() != 0) {
             for (int i = 0; i < userIdList.size(); i++) {
                 Long userId = Long.parseLong(userIdList.get(i));
 
@@ -708,10 +719,10 @@ public class OrganizationActivitiesServiceImpl implements OrganizationActivities
                 List<String> roles = BaseUtils.getListFromString(currentUser.getRole());
                 SystemRole role = systemRoleDao.selectById(Long.parseLong(roles.get(0)));
                 ActUserBean actUserBean = new ActUserBean();
-                if(role.getId() == 1) {
+                if (role.getId() == 1) {
                     //如果是个人用户
                     actUserBean.setName(userInformation.getName());
-                } else if(role.getId() == 2 || role.getId() == 3) {
+                } else if (role.getId() == 2 || role.getId() == 3) {
                     //如果是企业是不会有name的，所以展示的是username
                     actUserBean.setName(currentUser.getUsername());
                 }
