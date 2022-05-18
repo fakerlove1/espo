@@ -13,7 +13,7 @@ import java.util.Map;
  * @author croton
  * @create 2021/3/31 20:56
  */
-//@Lazy(false)
+@Lazy(false)
 @Component
 //@SuppressWarnings("unchecked")
 public class SpringUtils implements ApplicationContextAware {

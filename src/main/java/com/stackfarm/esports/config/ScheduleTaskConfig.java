@@ -23,6 +23,7 @@ import java.util.List;
  */
 @Configuration
 @Slf4j
+@Lazy
 public class ScheduleTaskConfig {
 
     private MemberAuthenticationDao memberAuthenticationDao = SpringUtils.getBean("memberAuthenticationDao");
@@ -92,7 +93,5 @@ public class ScheduleTaskConfig {
             memberAuthentication.setState(AuthenticationStateConstant.LOGOUT);
         }
     }
-
-
 
 }
