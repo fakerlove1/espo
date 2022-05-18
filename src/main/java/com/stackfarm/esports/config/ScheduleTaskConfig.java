@@ -6,8 +6,10 @@ import com.stackfarm.esports.pojo.authorize.AnnualInfo;
 import com.stackfarm.esports.pojo.authorize.MemberAuthentication;
 import com.stackfarm.esports.system.AuthenticationStateConstant;
 import com.stackfarm.esports.a.SpringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.List;
  */
 @Configuration
 @Lazy(false)
+@EnableScheduling
+@Slf4j
 public class ScheduleTaskConfig {
 
     private MemberAuthenticationDao memberAuthenticationDao = SpringUtils.getBean("memberAuthenticationDao");
@@ -30,9 +34,8 @@ public class ScheduleTaskConfig {
      * 每到12.1更新一次，开始年审
      */
     @Scheduled(cron = "0 55 12 31 12 *")
-//    @Scheduled(cron = "0 0 0 1 12 *")
     public void startAnnual() {
-        System.out.println("开始年审");
+        log.info("开始年审");
         //所有运动员的状态变成年审中
         List<MemberAuthentication> all = memberAuthenticationDao.selectByStateAndType(AuthenticationStateConstant.AUTHORIZED, "PLAYER");
         List<MemberAuthentication> all1 = memberAuthenticationDao.selectByStateAndType(AuthenticationStateConstant.LOGOUTING, "PLAYER");
@@ -65,7 +68,7 @@ public class ScheduleTaskConfig {
     @Scheduled(cron = "59 59 23 31 1 *")
 //    @Scheduled(cron = "0 0 0 1 1 *")
     public void endAnnual() {
-        System.out.println("年审结束");
+        log.info("年审结束");
         //年审未通过
         List<MemberAuthentication> all1 = memberAuthenticationDao.selectByStateAndType(AuthenticationStateConstant.ANNUAL_UNAUTHORIZED, "PLAYER");
         for (MemberAuthentication memberAuthentication : all1) {
