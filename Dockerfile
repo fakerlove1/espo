@@ -1,4 +1,4 @@
-FROM registry.cn-shanghai.aliyuncs.com/jokerak/jdk
+FROM openjdk:11.0.15-oracle
 EXPOSE 9000
 ARG JAR_FILE
 ADD ${JAR_FILE} /app.jar
