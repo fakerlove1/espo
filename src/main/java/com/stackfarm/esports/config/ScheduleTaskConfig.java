@@ -22,8 +22,6 @@ import java.util.List;
  * @create 2021/9/5 16:06
  */
 @Configuration
-@Lazy(false)
-@EnableScheduling
 @Slf4j
 public class ScheduleTaskConfig {
 
